@@ -1,0 +1,21 @@
+# Webpack files
+# ------------------------------------------------------------------------
+/node_modules
+/app/server/resources/assets/**
+!/app/server/resources/assets/.gitkeep
+
+# Others
+# ------------------------------------------------------------------------
+.metals
+.bloop
+.ammonite
+.env
+*.class
+*.log
+tags
+.*.swp 
+.*.swo
+.DS_Store
+tmuxp.*
+/docs
+target/
