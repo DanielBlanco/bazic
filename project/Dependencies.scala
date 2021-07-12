@@ -5,12 +5,14 @@ import CrossVersion._
 
 object Dependencies {
   object V {
-    val laminar   = "0.13.0"
-    val laminext  = "0.13.5"
-    val sttp      = "3.3.6"
-    val zioConfig = "1.0.6"
-    val zioHttp   = "1.0.0.0-RC17"
-    val zio       = "1.0.9"
+    val caliban    = "1.1.0"
+    val laminar    = "0.13.0"
+    val laminext   = "0.13.5"
+    val sttp       = "3.3.6"
+    val zioConfig  = "1.0.6"
+    val zioHttp    = "1.0.0.0-RC17"
+    val zioPrelude = "1.0.0-RC5"
+    val zio        = "1.0.9"
   }
 
   object Laminar {
@@ -31,6 +33,8 @@ object Dependencies {
 
     def backend = Def.setting(
       Seq[ModuleID](
+        "com.github.ghostdogpr"         %% "caliban"                % V.caliban,
+        "com.github.ghostdogpr"         %% "caliban-zio-http"       % V.caliban,
         "io.d11"                        %% "zhttp"                  % V.zioHttp,
         "com.softwaremill.sttp.client3" %% "httpclient-backend-zio" % V.sttp
       )
@@ -47,6 +51,7 @@ object Dependencies {
 
     def backend = Def.setting(
       Seq[ModuleID](
+        "dev.zio" %% "zio-prelude"         % V.zioPrelude,
         "dev.zio" %% "zio-config"          % V.zioConfig,
         "dev.zio" %% "zio-config-yaml"     % V.zioConfig,
         "dev.zio" %% "zio-config-typesafe" % V.zioConfig

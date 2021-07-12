@@ -1,11 +1,17 @@
 package app
 
 import app.server.*
+import app.graphql.*
+import caliban.*
+import caliban.GraphQL.graphQL
+import caliban.RootResolver
 import zio.*
+import zio.stream.ZStream
 import zio.blocking.*
 import zio.clock.*
 import zio.console.*
-import zhttp.http._
+import zio.prelude.*
+import zhttp.http.*
 import zhttp.service.Server
 
 object Main extends App:
@@ -31,14 +37,37 @@ object Main extends App:
       c <- Config.service
       _ <- putStrLn(s"Server host: ${c.server.host}")
       _ <- putStrLn(s"Server port: ${c.server.port}")
-      p <- buildServer(c.server)
+      _ <- putStrLn("---- GraphQL ----")
+      _ <- putStrLn(api.render)
+      _ <- putStrLn("-----------------")
+      _ <- Server.start(c.server.port, httpApp)
     yield
-      p
+      ()
 
-  private def buildServer(cfg: ServerConfig) =
-    Server.start(cfg.port, httpApp).map(_ => ())
+  private lazy val httpApp = healtcheckRoutes +++ graphqlRoutes
 
-  private val httpApp =
+  private lazy val healtcheckRoutes =
     Http.collect[Request] {
-      case Method.GET -> Root / "text" => Response.text("Hello World!")
+      case Method.GET -> Root / "hello" => Response.text("Hello World!")
     }
+
+  private lazy val graphqlRoutes =
+    Http.route[Request] {
+      case _ -> Root / "api" / "graphql" =>
+        Http.fromEffect {
+          for
+            interpreter <- api.interpreter
+          yield ZHttpAdapter.makeHttpService(interpreter)
+        }.flatten
+      // case _ -> Root / "graphiql"        =>
+      //   graphiql
+    }
+
+  val api = graphQL(RootResolver(queries))
+
+  // private val graphiql =
+  //   Http.succeed(
+  //     Response.http(
+  //       content = HttpData.fromStream(ZStream.fromResource("graphiql.html"))
+  //     )
+  //   )
